@@ -58,13 +58,12 @@ class Stations {
         }
     }
 
-    // Assuming a function that converts FilePath to String for FileManager operations
-    static func getStats(fromFileStream path: FilePath) throws -> Stations {
-        let stations = Stations()
-        // Convert FilePath to String for FileManager
-        let pathString = path.description
+}
 
-        // Open the file for reading; adjust based on your streaming API
+extension Stations {
+    static func getStats(fromFileStream pathString: String) throws -> Stations {
+        let stations = Stations()
+
         guard let file = FileHandle(forReadingAtPath: pathString) else {
             throw NSError(domain: "FileError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Unable to open file at \(pathString)"])
         }
@@ -75,8 +74,8 @@ class Stations {
         var buffer = Data()
         let newline = "\n".data(using: .utf8)!
 
-        while let chunk = try? file.read(upToCount: 1024), let data = chunk, !data.isEmpty {
-            buffer.append(data)
+        while let chunk = try? file.read(upToCount: 1024), !chunk.isEmpty {
+            buffer.append(chunk)
             while let range = buffer.range(of: newline) {
                 let lineData = buffer.subdata(in: buffer.startIndex..<range.lowerBound)
                 buffer.removeSubrange(buffer.startIndex...range.lowerBound)
@@ -86,19 +85,17 @@ class Stations {
                         let parsed = try parseLine(line)
                         stations.store(name: parsed.name, temp: parsed.value)
                     } catch ParseError.lineIsComment {
-                        // Ignore comment lines
-                        continue
+                        continue // Ignore comment lines
                     } catch {
-                        // For simplicity, log the error. You might want to handle it differently.
                         print("Error parsing line: \(error)")
                     }
                 }
             }
         }
-
         return stations
     }
 }
+
 
 // Parses a single line of data into station name and temperature
 func parseLine(_ buff: String) throws -> (name: String, value: Double) {
@@ -118,7 +115,7 @@ func parseLine(_ buff: String) throws -> (name: String, value: Double) {
 
 // Example usage
 do {
-    let path = FilePath("../data/measurements_10k.txt") // Convert this FilePath to String if needed
+    let path = "../data/measurements_10k.txt" // Convert this FilePath to String if needed
     let stats = try Stations.getStats(fromFileStream: path)
     stats.printSummary()
     // Additional processing...
