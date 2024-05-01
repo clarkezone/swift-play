@@ -22,9 +22,10 @@ class WebsocketClients {
     }
     
     func handleReceive(ws: WebSocket, str: String){
-        if str=="requestplay"{
-            sendToAll("doplay")
-        }
+//        if str=="requestplay"{
+//            sendToAll("doplay")
+ //       }
+        sendToAll(str)
     }
     
     func handleClose() {}
@@ -33,8 +34,7 @@ class WebsocketClients {
 // configures your application
 public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
-    // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
-
+    app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     let clients = WebsocketClients(eventLoop: app.eventLoopGroup.next())
 
        app.webSocket("channel") { req, ws in

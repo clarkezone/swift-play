@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- saved from url=(0046)https://www.learnrive.com/samples/sample4.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Rive Alpha Test</title>
+<body style="background-color: transparent;">
+    <canvas id="riveCanvas" width="512" height="512"></canvas>
+    <script src="https://unpkg.com/@rive-app/canvas@2.10.3"></script>
+    <script>
+const riveInstance = new rive.Rive({
+  // Load a local riv `clean_the_car.riv` or upload your own!
+  src: "alphatest.riv",
+  // Be sure to specify the correct state machine (or animation) name
+//  stateMachines: "State Machine 1", // Name of the State Machine to play
+  canvas: riveCanvas,
+  autoplay: false,
+  onLoad: () => {
+    // Prevent a blurry canvas by using the device pixel ratio
+    riveInstance.resizeDrawingSurfaceToCanvas();
+  }
+});
+
+// Resize the drawing surface if the window resizes
+window.addEventListener(
+  "resize",
+  () => {
+    riveInstance.resizeDrawingSurfaceToCanvas();
+  },
+  false
+);
+
+// Create WebSocket connection.
+//const socket = new WebSocket("ws://100.115.218.3:8080/channel");
+const socket = new WebSocket("ws://"+location.host+"/channel");
+
+// Connection opened
+socket.addEventListener("open", (event) => {
+  //socket.send("requestplay");
+});
+
+// Listen for messages
+socket.addEventListener("message", (event) => {
+  console.log("Message from server ", event.data);
+	const words = event.data.split(':');
+	if (words[0] == "play" && words[1]!="") {
+		riveInstance.play(words[1]);
+	}
+	if (words[0] == "pause" && words[1]!="") {
+		riveInstance.pause(words[1]);
+	}
+	if (words[0] == "stop" && words[1]!="") {
+		riveInstance.pause(words[1]);
+	}
+});
+
+    </script>
+
+</body></html>
