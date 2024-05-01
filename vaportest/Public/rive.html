@@ -2,7 +2,7 @@
 <!-- saved from url=(0046)https://www.learnrive.com/samples/sample4.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Rive Alpha Test</title>
-<body style="background-color: transparent;">
+<body style="background-color: grey;">
     <canvas id="riveCanvas" width="512" height="512"></canvas>
     <script src="https://unpkg.com/@rive-app/canvas@2.10.3"></script>
     <script>
@@ -50,11 +50,16 @@ socket.addEventListener("message", (event) => {
 	if (words[0] == "stop" && words[1]!="") {
 		riveInstance.pause(words[1]);
 	}
+	if (words[0] == "reset") {
+		riveInstance.reset();
+	}
 	if (words[0] == "exitValue" && words[1]!="" && words[2]!="") {
 		const inputs = riveInstance.stateMachineInputs(words[1]);
 		// Find the input you want to set a value for, or trigger
-		const exitValue = inputs.find(i => i.name === 'exit');
-		exitValue.value=words[2];
+		exitValue = inputs.find(i => i.name === 'exit');
+		console.log("value:", exitValue.value);
+		//exitValue.value=words[2];
+		exitValue.value=true;
 
 	}
 });
