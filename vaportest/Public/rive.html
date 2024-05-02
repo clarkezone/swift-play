@@ -12,10 +12,22 @@
                 width: 300xpx;
                 height: 250px;
             }
+            .rive-slides {
+                position: absolute;
+                top: 50px;
+                left: 50px;
+                width: 300xpx;
+                height: 250px;
+            }
         </style>
     </head>
     <body style="background-color: transparent">
-        <canvas id="riveCanvas" width="512" height="512"></canvas>
+        <canvas
+            id="riveCanvas"
+            width="512"
+            height="512"
+            class="rive-slides"
+        ></canvas>
 
         <canvas
             id="matrix1"
@@ -140,7 +152,7 @@
                         this.canvas.width,
                         this.canvas.height,
                     );
-                    this.ctx.fillStyle = "#0F0";
+                    //this.ctx.fillStyle = "#0F0";
                     this.ctx.font = this.font_size + "px arial";
 
                     this.tickCounter++;
