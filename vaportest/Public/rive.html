@@ -37,6 +37,7 @@
         ></canvas>
         <script src="https://unpkg.com/@rive-app/canvas@2.10.3"></script>
         <script>
+            var matrixInstance = null;
             const riveInstance = new rive.Rive({
                 // Load a local riv `clean_the_car.riv` or upload your own!
                 src: "alphatest.riv",
@@ -72,6 +73,14 @@
             socket.addEventListener("message", (event) => {
                 console.log("Message from server ", event.data);
                 const words = event.data.split(":");
+                if (words[0] == "playmatrix") {
+                    const canvas = document.getElementById("matrix1");
+                    matrixInstance = new Matrix(canvas);
+                }
+                if (words[0] == "stopmatrix") {
+                    const canvas = document.getElementById("matrix1");
+                    matrixInstance.stop();
+                }
                 if (words[0] == "play" && words[1] != "") {
                     riveInstance.play(words[1]);
                 }
@@ -201,14 +210,18 @@
                 }
 
                 start() {
-                    setInterval(() => this.draw(), 30);
+                    this.intervalId = setInterval(() => this.draw(), 30);
+                }
+
+                stop() {
+                    clearInterval(this.intervalId);
                 }
             }
 
-            window.onload = function () {
-                const canvas = document.getElementById("matrix1");
-                new Matrix(canvas);
-            };
+            // window.onload = function () {
+            //     const canvas = document.getElementById("matrix1");
+            //     new Matrix(canvas);
+            // };
         </script>
     </body>
 </html>
