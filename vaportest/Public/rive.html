@@ -92,7 +92,8 @@
                 ) {
                     riveInstance.load({
                         src: words[1],
-                        canvas: words[2],
+                        canvas: riveCanvas,
+                        artboard: words[2],
                         autoplay: false,
                         onLoad: () => {
                             // Prevent a blurry canvas by using the device pixel ratio
