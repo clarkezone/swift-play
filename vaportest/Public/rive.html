@@ -93,7 +93,7 @@
                     riveInstance.load({
                         src: words[1],
                         canvas: riveCanvas,
-                        artboard: words[2],
+                        //artboard: words[2],
                         autoplay: false,
                         onLoad: () => {
                             // Prevent a blurry canvas by using the device pixel ratio
@@ -114,6 +114,7 @@
                     riveInstance.setTextRunValue(words[1], words[2]);
                 }
                 if (words[0] == "reset") {
+                    riveInstance.cleanupInstances();
                     riveInstance.reset();
                 }
                 if (
