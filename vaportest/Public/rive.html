@@ -85,7 +85,11 @@
                     const canvas = document.getElementById("matrix1");
                     matrixInstance.pause();
                 }
-                if (words[0] == "loadRiv" && words[1] != "" && words[2] != "") {
+                if (
+                    words[0] == "loadrivefile" &&
+                    words[1] != "" &&
+                    words[2] != ""
+                ) {
                     riveInstance.load({
                         src: words[1],
                         canvas: words[2],
