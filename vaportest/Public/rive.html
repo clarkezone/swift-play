@@ -16,16 +16,16 @@
                 position: absolute;
                 top: 250px;
                 left: 50px;
-                width: 577xpx;
-                height: 500px;
+                width: 800xpx;
+                height: 600px;
             }
         </style>
     </head>
     <body style="background-color: transparent">
         <canvas
             id="riveCanvas"
-            width="512"
-            height="512"
+            width="10"
+            height="10"
             class="rive-slides"
         ></canvas>
 
@@ -84,6 +84,17 @@
                 if (words[0] == "pausematrix") {
                     const canvas = document.getElementById("matrix1");
                     matrixInstance.pause();
+                }
+                if (words[0] == "loadRiv" && words[1] != "" && words[2] != "") {
+                    riveInstance.load({
+                        src: words[1],
+                        canvas: words[2],
+                        autoplay: false,
+                        onLoad: () => {
+                            // Prevent a blurry canvas by using the device pixel ratio
+                            riveInstance.resizeDrawingSurfaceToCanvas();
+                        },
+                    });
                 }
                 if (words[0] == "play" && words[1] != "") {
                     riveInstance.play(words[1]);
