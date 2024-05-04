@@ -94,7 +94,6 @@
                         src: words[1],
                         canvas: riveCanvas,
                         artboard: words[2],
-                        autoplay: false,
 //			stateMachines: "TAKSM Auto",
 			animations: "MoveOff",
                         autoplay: true,
@@ -116,9 +115,12 @@
                 if (words[0] == "setRun" && words[1] != "" && words[2] != "") {
                     riveInstance.setTextRunValue(words[1], words[2]);
                 }
-                if (words[0] == "reset") {
-                    riveInstance.cleanupInstances();
-                    riveInstance.reset();
+                if (words[0] == "reset"  && words[1] != "" && words[2] != "") {
+			riveInstance.reset({
+			artboard: words[1],
+			animations: words[2],
+			autoplay: true,
+			    });
                 }
                 if (
                     words[0] == "exitValue" &&
@@ -126,11 +128,12 @@
                     words[2] != ""
                 ) {
                     const inputs = riveInstance.stateMachineInputs(words[1]);
-                    // Find the input you want to set a value for, or trigger
-                    exitValue = inputs.find((i) => i.name === "exit");
-                    console.log("value:", exitValue.value);
+                    //exitValue = inputs.find((i) => i.name === "exit");
+                    exitValue = inputs.find((i) => i.name == words[2]);
+                    console.log("words[0]:%s words[1]:%s words[2] value:%s", 
+			    words[0], words[1], words[2], exitValue.value);
                     //exitValue.value=words[2];
-                    exitValue.value = true;
+                    exitValue.value = !exitValue.value;
                 }
             });
         </script>
