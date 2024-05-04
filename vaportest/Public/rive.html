@@ -90,6 +90,8 @@
                     words[1] != "" &&
                     words[2] != ""
                 ) {
+                    console.log("Loadrive words[0]:%s words[1]:%s words[2]:%s", 
+			    words[0], words[1], words[2]);
                     riveInstance.load({
                         src: words[1],
                         canvas: riveCanvas,
@@ -130,7 +132,7 @@
                     const inputs = riveInstance.stateMachineInputs(words[1]);
                     //exitValue = inputs.find((i) => i.name === "exit");
                     exitValue = inputs.find((i) => i.name == words[2]);
-                    console.log("words[0]:%s words[1]:%s words[2] value:%s", 
+                    console.log("words[0]:%s words[1]:%s words[2]%s value:%s", 
 			    words[0], words[1], words[2], exitValue.value);
                     //exitValue.value=words[2];
                     exitValue.value = !exitValue.value;
