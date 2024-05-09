@@ -165,6 +165,7 @@ class RiveInstance {
   }
 
   destroy() {
+    this.riveInstance.cleanup();
     this.canvas.remove();
   }
 
