@@ -20,6 +20,7 @@ class WebSocketManager {
   }
 
   handleMessage(data) {
+    console.log("Received message:", data);
     const words = data.split(":");
     const MESSAGE_TYPE = words[0];
 
@@ -34,9 +35,10 @@ class WebSocketManager {
         const HEIGHT = parseFloat(words[7]);
         const SMNAME = words[8];
         const AUTOPLAY = words[9];
+	console.log(INSTANCE_ID, INSTANCE_NAME, RIVE_SRC, X_POSITION, Y_POSITION, WIDTH, HEIGHT, SMNAME, AUTOPLAY);
         const instexists = this.riveInstances.get(INSTANCE_ID);
         if (!instexists) {
-          console.log("Creating instance ", INSTANCE_NAME);
+          console.log("Adding instance:", INSTANCE_ID);
           this.addRiveInstance(
             INSTANCE_ID,
             INSTANCE_NAME,
@@ -99,7 +101,7 @@ class WebSocketManager {
             break;
           case "reset":
             if (PARAM_1 && PARAM_2) {
-              INSTANCE_COMMAND.reset(PARAM_1, PARAM_2);
+              INSTANCE_COMMAND.resetstatemachine(PARAM_1, PARAM_2);
             }
             break;
           case "exitValue":
@@ -130,7 +132,7 @@ class WebSocketManager {
 
   updateRiveInstance(existing, name, x, y, width, height, smname, autoplay) {
     const instance = existing;
-    instance.reset(smname, "", autoplay);
+    instance.resetstatemachine(smname, autoplay);
     instance.updateDom(name, x, y, width, height);
   }
 
@@ -194,10 +196,18 @@ class RiveInstance {
     this.riveInstance.setTextRunValue(text, value);
   }
 
-  reset(artboard, animations, autoplay) {
+  resetstatemachine(artboard, autoplay) {
+    console.log(artboard, autoplay);
+    this.riveInstance.reset({
+      statemachine: artboard,
+      autoplay: autoplay,
+    });
+  }
+
+  resetartboard(artboard, autoplay) {
+    console.log(artboard, autoplay);
     this.riveInstance.reset({
       artboard: artboard,
-      animations: animations,
       autoplay: autoplay,
     });
   }
