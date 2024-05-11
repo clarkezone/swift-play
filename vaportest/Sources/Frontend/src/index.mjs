@@ -78,6 +78,7 @@ class WebSocketManager {
         const PARAM_1 = words[2];
         const PARAM_2 = words[3];
         const PARAM_3 = words[4];
+        const PARAM_4 = words[5];
         switch (MESSAGE_TYPE) {
           case "play":
             if (PARAM_1) {
@@ -105,18 +106,36 @@ class WebSocketManager {
             }
             break;
           case "exitValue":
-            if (PARAM_1 && PARAM_2) {
-              const inputs = INSTANCE_COMMAND.stateMachineInputs(PARAM_1);
-              const exitValue = inputs.find((i) => i.name == PARAM_2);
+            if (PARAM_1) {
+	      console.log(`exitvalue called with P1:"${PARAM_1}":P2:"${PARAM_2}"P3:"${PARAM_3}"P4:"${PARAM_4}":`);
+		INSTANCE_COMMAND.switchArtboardIfNeeded(PARAM_1, PARAM_2, true);
+	      console.log(`Getting inputs for "${PARAM_2}"`);
+              const inputs = INSTANCE_COMMAND.stateMachineInputs(PARAM_2);
+	      if (inputs!=null) {
+		console.log("finding inputs ", PARAM_3);
+              const exitValue = inputs.find((i) => i.name == PARAM_3);
               if (exitValue) {
-                if (PARAM_3) {
-                  console.log(`exitValue set to ${PARAM_3}`);
-                  exitValue.value = PARAM_3;
+		console.log("input found");
+                if (PARAM_4) {
+                  console.log(`exitValue set to value of Param4: ${PARAM_4}`);
+		  if (PARAM_4.toLowerCase() === "true") {
+		   console.log("setting to true");
+                   exitValue.value = true
+		} else if (PARAM_4.toLowerCase() === "false") {
+		   console.log("setting to false");
+		  exitValue.value = false
+         	}
+		console.log("done with set.");
                 } else {
                   console.log(`exitValue toggled to ${exitValue.value}`);
                   exitValue.value = !exitValue.value;
                 }
-              }
+              } else {
+		console.error(`exitValue "${exitValue}" not found.`);
+	      }
+           } else { 
+console.log("inputs is null for statemachine", PARAM_2);
+							}
             }
             break;
           default:
@@ -197,23 +216,39 @@ class RiveInstance {
     this.riveInstance.setTextRunValue(text, value);
   }
 
+  switchArtboardIfNeeded(artboard, statemachine, autoplay) {
+		// TODO: if artboard is the same but statemachine is different we don't work
+    console.log("SwitchArtboardIfNeeded", artboard);
+    let one = this.riveInstance.artboard.name;
+    console.log("currentArtboard", one);
+    if (one.localeCompare(artboard)!=0) {
+      console.log("Artboard is the different");
+      this.resetartboard(artboard, statemachine, autoplay);
+    } else {
+			console.log("Artboard is the same");
+		}
+  }
+
   resetstatemachine(artboard, autoplay) {
-    console.log(artboard, autoplay);
+    console.log("ResetStateMachine", artboard, autoplay);
     this.riveInstance.reset({
-      statemachine: artboard,
+      artboard: artboard,
+//      statemachine: artboard,
       autoplay: autoplay,
     });
   }
 
-  resetartboard(artboard, autoplay) {
-    console.log(artboard, autoplay);
+  resetartboard(artboard, statemachine, autoplay) {
+    console.log("ResetArtboard", artboard, autoplay);
     this.riveInstance.reset({
       artboard: artboard,
+      stateMachines: statemachine,
       autoplay: autoplay,
     });
   }
 
   stateMachineInputs(input) {
+    console.log("StateMachineInputs " + input);
     return this.riveInstance.stateMachineInputs(input);
   }
 }
