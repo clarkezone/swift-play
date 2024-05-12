@@ -105,9 +105,9 @@ class WebSocketManager {
               INSTANCE_COMMAND.resetstatemachine(PARAM_1, PARAM_2);
             }
             break;
-          case "exitValue":
-            if (PARAM_1) {
-	      console.log(`exitvalue called with P1:"${PARAM_1}":P2:"${PARAM_2}"P3:"${PARAM_3}"P4:"${PARAM_4}":`);
+          case "runstep":
+            if (PARAM_1 && PARAM_2) {
+	      console.log(`runstep called with P1:"${PARAM_1}":P2:"${PARAM_2}"P3:"${PARAM_3}"P4:"${PARAM_4}":`);
 		INSTANCE_COMMAND.switchArtboardIfNeeded(PARAM_1, PARAM_2, true);
 	      console.log(`Getting inputs for "${PARAM_2}"`);
               const inputs = INSTANCE_COMMAND.stateMachineInputs(PARAM_2);
