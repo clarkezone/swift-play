@@ -25,122 +25,150 @@ class WebSocketManager {
     const MESSAGE_TYPE = words[0];
 
     switch (MESSAGE_TYPE) {
-      case "addInstance":
-        const INSTANCE_ID = words[1];
-        const INSTANCE_NAME = words[2];
-        const RIVE_SRC = words[3];
-        const X_POSITION = parseFloat(words[4]);
-        const Y_POSITION = parseFloat(words[5]);
-        const WIDTH = parseFloat(words[6]);
-        const HEIGHT = parseFloat(words[7]);
-        const SMNAME = words[8];
-        const AUTOPLAY = words[9];
-	console.log(INSTANCE_ID, INSTANCE_NAME, RIVE_SRC, X_POSITION, Y_POSITION, WIDTH, HEIGHT, SMNAME, AUTOPLAY);
-        const instexists = this.riveInstances.get(INSTANCE_ID);
-        if (!instexists) {
-          console.log("Adding instance:", INSTANCE_ID);
-          this.addRiveInstance(
-            INSTANCE_ID,
-            INSTANCE_NAME,
-            RIVE_SRC,
-            X_POSITION,
-            Y_POSITION,
-            WIDTH,
-            HEIGHT,
-	    SMNAME,
-	    AUTOPLAY
-          );
-        } else {
-          console.log("Instance already exists:", INSTANCE_ID);
-          this.updateRiveInstance(
-            instexists,
-            INSTANCE_ID,
-            X_POSITION,
-            Y_POSITION,
-            WIDTH,
-            HEIGHT,
-	    SMNAME,
-	    AUTOPLAY
-          );
-        }
+      case "addRiveInstance":
+        this.handleAddRiveInstance(words);
         break;
-      case "removeInstance":
+      case "removeRiveInstance":
         const INSTANCE_ID_TO_REMOVE = words[1];
-        this.removeRiveInstance(INSTANCE_ID_TO_REMOVE);
+        this.handleRemoveRiveInstance(INSTANCE_ID_TO_REMOVE);
         break;
       default:
-        const INSTANCE_ID_COMMAND = words[1];
-        const INSTANCE_COMMAND = this.riveInstances.get(INSTANCE_ID_COMMAND);
-        if (!INSTANCE_COMMAND) {
-          console.error(`Rive instance "${INSTANCE_NAME_COMMAND}" not found.`);
-          return;
+        this.handleRiveCommand(words);
+    }
+  }
+
+  handleAddRiveInstance(words) {
+    const INSTANCE_ID = words[1];
+    const INSTANCE_NAME = words[2];
+    const RIVE_SRC = words[3];
+    const X_POSITION = parseFloat(words[4]);
+    const Y_POSITION = parseFloat(words[5]);
+    const WIDTH = parseFloat(words[6]);
+    const HEIGHT = parseFloat(words[7]);
+    const SMNAME = words[8];
+    const AUTOPLAY = words[9];
+    console.log(INSTANCE_ID, INSTANCE_NAME, RIVE_SRC, X_POSITION, Y_POSITION, WIDTH, HEIGHT, SMNAME, AUTOPLAY);
+    const instexists = this.riveInstances.get(INSTANCE_ID);
+    if (!instexists) {
+      console.log("Adding instance:", INSTANCE_ID);
+      this.addRiveInstance(
+        INSTANCE_ID,
+        INSTANCE_NAME,
+        RIVE_SRC,
+        X_POSITION,
+        Y_POSITION,
+        WIDTH,
+        HEIGHT,
+        SMNAME,
+        AUTOPLAY
+      );
+    } else {
+      console.log("Instance already exists:", INSTANCE_ID);
+      this.updateRiveInstance(
+        instexists,
+        INSTANCE_ID,
+        X_POSITION,
+        Y_POSITION,
+        WIDTH,
+        HEIGHT,
+        SMNAME,
+        AUTOPLAY
+      );
+    }
+  }
+
+  handleRemoveRiveInstance(name) {
+    const instance = this.riveInstances.get(name);
+    if (instance) {
+      instance.destroy();
+      this.riveInstances.delete(name);
+    }
+  }
+
+  handleRiveCommand(words) {
+    const INSTANCE_ID_COMMAND = words[1];
+    const riveInstance = this.riveInstances.get(INSTANCE_ID_COMMAND);
+    if (!riveInstance) {
+      console.error(`Rive instance "${INSTANCE_NAME_COMMAND}" not found.`);
+      return;
+    }
+    const PARAM_1 = words[2];
+    const PARAM_2 = words[3];
+    const PARAM_3 = words[4];
+    const PARAM_4 = words[5];
+    const PARAM_5 = words[6];
+    switch (MESSAGE_TYPE) {
+      case "play":
+        if (PARAM_1) {
+          riveInstance.play(PARAM_1);
         }
-        const PARAM_1 = words[2];
-        const PARAM_2 = words[3];
-        const PARAM_3 = words[4];
-        const PARAM_4 = words[5];
-        switch (MESSAGE_TYPE) {
-          case "play":
-            if (PARAM_1) {
-              INSTANCE_COMMAND.play(PARAM_1);
-            }
-            break;
-          case "pause":
-            if (PARAM_1) {
-              INSTANCE_COMMAND.pause(PARAM_1);
-            }
-            break;
-          case "stop":
-            if (PARAM_1) {
-              INSTANCE_COMMAND.stop(PARAM_1);
-            }
-            break;
-          case "setRun":
-            if (PARAM_1 && PARAM_2) {
-              INSTANCE_COMMAND.setTextRunValue(PARAM_1, PARAM_2);
-            }
-            break;
-          case "reset":
-            if (PARAM_1 && PARAM_2) {
-              INSTANCE_COMMAND.resetstatemachine(PARAM_1, PARAM_2);
-            }
-            break;
-          case "runstep":
-            if (PARAM_1 && PARAM_2) {
-	      console.log(`runstep called with P1:"${PARAM_1}":P2:"${PARAM_2}"P3:"${PARAM_3}"P4:"${PARAM_4}":`);
-		INSTANCE_COMMAND.switchArtboardIfNeeded(PARAM_1, PARAM_2, true);
-	      console.log(`Getting inputs for "${PARAM_2}"`);
-              const inputs = INSTANCE_COMMAND.stateMachineInputs(PARAM_2);
-	      if (inputs!=null) {
-		console.log("finding inputs ", PARAM_3);
-              const exitValue = inputs.find((i) => i.name == PARAM_3);
-              if (exitValue) {
-		console.log("input found");
-                if (PARAM_4) {
-                  console.log(`exitValue set to value of Param4: ${PARAM_4}`);
-		  if (PARAM_4.toLowerCase() === "true") {
-		   console.log("setting to true");
-                   exitValue.value = true
-		} else if (PARAM_4.toLowerCase() === "false") {
-		   console.log("setting to false");
-		  exitValue.value = false
-         	}
-		console.log("done with set.");
-                } else {
-                  console.log(`exitValue toggled to ${exitValue.value}`);
-                  exitValue.value = !exitValue.value;
-                }
-              } else {
-		console.error(`exitValue "${exitValue}" not found.`);
-	      }
-           } else { 
-console.log("inputs is null for statemachine", PARAM_2);
-							}
-            }
-            break;
-          default:
-            console.log("Unknown message type:", MESSAGE_TYPE);
+        break;
+      case "pause":
+        if (PARAM_1) {
+          riveInstance.pause(PARAM_1);
         }
+        break;
+      case "stop":
+        if (PARAM_1) {
+          riveInstance.stop(PARAM_1);
+        }
+        break;
+      case "setRun":
+        if (PARAM_1 && PARAM_2) {
+          riveInstance.setTextRunValue(PARAM_1, PARAM_2);
+        }
+        break;
+      case "reset":
+        if (PARAM_1 && PARAM_2) {
+          riveInstance.resetstatemachine(PARAM_1, PARAM_2);
+        }
+        break;
+      case "runstep":
+        switch (PARAM_1) {
+          case "RIVECMD":
+            this.handleRiveStep(PARAM_2, PARAM_3, PARAM_4, PARAM_5, riveInstance);
+            break;
+          case "MATRIXCMD":
+
+            break;
+        }
+        break;
+      default:
+        console.log("Unknown message type:", MESSAGE_TYPE);
+    }
+  }
+
+  handleRiveStep(artBoard, stateMachine, inputName, inputValue, riveInstance) {
+    if (artBoard && stateMachine) {
+      console.log(`handleRiveStep called with P1:"${artBoard}":P2:"${stateMachine}"P3:"${inputName}"P4:"${inputValue}":`);
+      riveInstance.switchArtboardIfNeeded(artBoard, stateMachine, true);
+      console.log(`Getting inputs for "${stateMachine}"`);
+      const smInputs = riveInstance.stateMachineInputs(stateMachine);
+      if (smInputs != null) {
+        console.log("finding inputs ", inputName);
+        const namedInput = smInputs.find((i) => i.name == inputName);
+        if (namedInput) {
+          console.log("input found");
+          if (inputValue) {
+            console.log(`exitValue set to value of Param4: ${inputValue}`);
+            if (inputValue.toLowerCase() === "true") {
+              console.log("setting to true");
+              namedInput.value = true;
+            } else if (inputValue.toLowerCase() === "false") {
+              console.log("setting to false");
+              namedInput.value = false;
+            }
+            console.log("done with set.");
+          } else {
+            console.log(`exitValue toggled to ${namedInput.value}`);
+            namedInput.value = !namedInput.value;
+          }
+        } else {
+          console.error(`exitValue "${namedInput}" not found.`);
+        }
+      } else {
+        console.log("inputs is null for statemachine", stateMachine);
+      }
     }
   }
 
@@ -155,13 +183,6 @@ console.log("inputs is null for statemachine", PARAM_2);
     instance.updateDom(name, x, y, width, height);
   }
 
-  removeRiveInstance(name) {
-    const instance = this.riveInstances.get(name);
-    if (instance) {
-      instance.destroy();
-      this.riveInstances.delete(name);
-    }
-  }
 }
 
 class RiveInstance {
@@ -217,23 +238,23 @@ class RiveInstance {
   }
 
   switchArtboardIfNeeded(artboard, statemachine, autoplay) {
-		// TODO: if artboard is the same but statemachine is different we don't work
+    // TODO: if artboard is the same but statemachine is different we don't work
     console.log("SwitchArtboardIfNeeded", artboard);
     let one = this.riveInstance.artboard.name;
     console.log("currentArtboard", one);
-    if (one.localeCompare(artboard)!=0) {
+    if (one.localeCompare(artboard) != 0) {
       console.log("Artboard is the different");
       this.resetartboard(artboard, statemachine, autoplay);
     } else {
-			console.log("Artboard is the same");
-		}
+      console.log("Artboard is the same");
+    }
   }
 
   resetstatemachine(artboard, autoplay) {
     console.log("ResetStateMachine", artboard, autoplay);
     this.riveInstance.reset({
       artboard: artboard,
-//      statemachine: artboard,
+      //      statemachine: artboard,
       autoplay: autoplay,
     });
   }
