@@ -94,6 +94,7 @@ class WebSocketManager {
   }
 
   handleRiveCommand(words) {
+    const MESSAGE_TYPE = words[0];
     const INSTANCE_ID_COMMAND = words[1];
     const riveInstance = this.riveInstances.get(INSTANCE_ID_COMMAND);
     if (!riveInstance) {
@@ -104,7 +105,7 @@ class WebSocketManager {
     const PARAM_2 = words[3];
     const PARAM_3 = words[4];
     const PARAM_4 = words[5];
-    const PARAM_5 = words[6];
+//    const PARAM_5 = words[6];
     switch (MESSAGE_TYPE) {
       case "play":
         if (PARAM_1) {
@@ -131,22 +132,15 @@ class WebSocketManager {
           riveInstance.resetstatemachine(PARAM_1, PARAM_2);
         }
         break;
-      case "runstep":
-        switch (PARAM_1) {
-          case "RIVECMD":
-            this.handleRiveStep(PARAM_2, PARAM_3, PARAM_4, PARAM_5, riveInstance);
-            break;
-          case "MATRIXCMD":
-
-            break;
-        }
+      case "runStep":
+    this.handleRiveStep(PARAM_1, PARAM_2, PARAM_3, PARAM_4, riveInstance);
         break;
       default:
         console.log("Unknown message type:", MESSAGE_TYPE);
     }
   }
 
-  handleRiveStep(artBoard, stateMachine, inputName, inputValue, RiveInstance) {
+  handleRiveStep(artBoard, stateMachine, inputName, inputValue, riveInstance) {
     if (artBoard && stateMachine) {
       console.log(`handleRiveStep called with P1:"${artBoard}":P2:"${stateMachine}"P3:"${inputName}"P4:"${inputValue}":`);
       riveInstance.switchArtboardIfNeeded(artBoard, stateMachine, true);
@@ -172,7 +166,7 @@ class WebSocketManager {
             namedInput.value = !namedInput.value;
           }
         } else {
-          console.error(`exitValue "${namedInput}" not found.`);
+          console.log(`inputName "${inputName}" not found.`);
         }
       } else {
         console.log("inputs is null for statemachine", stateMachine);
