@@ -1,9 +1,26 @@
-       class Matrix {
-                constructor(canvasId) {
-                    this.canvas = canvasId;
+       export class MatrixInstance {
+                constructor(id, name, x, y, width, height) {
+		    this.uuid = id;
+		    this.canvas = document.createElement('canvas');
+		    this.canvas.id = id;
+		    this.updateDom(name, x, y, width, height);
+		    document.body.appendChild(this.canvas);
                     this.ctx = this.canvas.getContext('2d');
                     this.init();
                 }
+
+	        destroy() {
+			this.canvas.remove();
+	       }
+
+	       updateDom(name, x, y, width, height) {
+			this.name = name;
+		       this.canvas.width = width;
+		       this.canvas.height = height;
+		       this.canvas.style.position = 'absolute';
+		       this.canvas.style.left = x + 'px';
+		       this.canvas.style.top = y + 'px';
+	       }
 
                 init() {
                     this.font_size = 20;

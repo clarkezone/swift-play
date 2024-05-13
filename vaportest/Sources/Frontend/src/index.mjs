@@ -1,4 +1,5 @@
 import "./styles.css";
+import {MatrixInstance} from "./matrix.mjs";
 
 const rive = require("@rive-app/canvas");
 
@@ -6,6 +7,7 @@ class WebSocketManager {
   constructor() {
     this.socket = new WebSocket("ws://" + location.host + "/channel");
     this.riveInstances = new Map();
+    this.matrixInstances = new Map();
     this.initSocket();
   }
 
@@ -31,6 +33,12 @@ class WebSocketManager {
       case "removeRiveInstance":
         const INSTANCE_ID_TO_REMOVE = words[1];
         this.handleRemoveRiveInstance(INSTANCE_ID_TO_REMOVE);
+        break;
+      case "addMatrixInstance":
+        this.handleAddMatrixInstance(words);
+        break;
+      case "removeMatrixInstance":
+        this.handleRemoveMatrixInstance(words);
         break;
       default:
         this.handleRiveCommand(words);
@@ -138,7 +146,7 @@ class WebSocketManager {
     }
   }
 
-  handleRiveStep(artBoard, stateMachine, inputName, inputValue, riveInstance) {
+  handleRiveStep(artBoard, stateMachine, inputName, inputValue, RiveInstance) {
     if (artBoard && stateMachine) {
       console.log(`handleRiveStep called with P1:"${artBoard}":P2:"${stateMachine}"P3:"${inputName}"P4:"${inputValue}":`);
       riveInstance.switchArtboardIfNeeded(artBoard, stateMachine, true);
@@ -181,6 +189,57 @@ class WebSocketManager {
     const instance = existing;
     instance.resetstatemachine(smname, autoplay);
     instance.updateDom(name, x, y, width, height);
+  }
+
+handleAddMatrixInstance(words) {
+    const INSTANCE_ID = words[1];
+    const INSTANCE_NAME = words[2];
+    const X_POSITION = parseFloat(words[3]);
+    const Y_POSITION = parseFloat(words[4]);
+    const WIDTH = parseFloat(words[5]);
+    const HEIGHT = parseFloat(words[6]);
+    console.log(INSTANCE_ID, INSTANCE_NAME, X_POSITION, Y_POSITION, WIDTH, HEIGHT);
+    const instexists = this.matrixInstances.get(INSTANCE_ID);
+    if (!instexists) {
+      console.log("Adding Matrix instance:", INSTANCE_ID);
+      this.addMatrixInstance(
+        INSTANCE_ID,
+        INSTANCE_NAME,
+        X_POSITION,
+        Y_POSITION,
+        WIDTH,
+        HEIGHT,
+      );
+    } else {
+      console.log("Matrix instance already exists:", INSTANCE_ID);
+      this.updateMatrixInstance(
+        instexists,
+        INSTANCE_ID,
+        X_POSITION,
+        Y_POSITION,
+        WIDTH,
+        HEIGHT,
+      );
+    }
+  }
+
+  addMatrixInstance(uuid, name, x, y, width, height) {
+    const instance = new MatrixInstance(uuid, name, x, y, width, height);
+    this.matrixInstances.set(uuid, instance);
+  }
+
+  updateMatrixInstance(existing, name, x, y, width, height) {
+    const instance = existing;
+    instance.updateDom(name, x, y, width, height);
+  }
+
+  handleRemoveMatrixInstance(words) {
+    const instanceId = words[1];
+    const instance = this.matrixInstances.get(instanceId);
+    if (instance) {
+      instance.destroy();
+      this.matrixInstances.delete(name);
+    }
   }
 
 }
