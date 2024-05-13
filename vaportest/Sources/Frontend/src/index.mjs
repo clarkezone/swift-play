@@ -232,7 +232,7 @@ handleAddMatrixInstance(words) {
     const instance = this.matrixInstances.get(instanceId);
     if (instance) {
       instance.destroy();
-      this.matrixInstances.delete(name);
+      this.matrixInstances.delete(instanceId);
     }
   }
 
