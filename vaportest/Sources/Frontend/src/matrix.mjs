@@ -3,6 +3,7 @@
 		    this.uuid = id;
 		    this.canvas = document.createElement('canvas');
 		    this.canvas.id = id;
+		    this.canvas.className = '.showThing';
 		    this.updateDom(name, x, y, width, height);
 		    document.body.appendChild(this.canvas);
                     this.ctx = this.canvas.getContext('2d');
@@ -11,6 +12,18 @@
 
 	        destroy() {
 			this.canvas.remove();
+	       }
+
+	       setVisible(visible) {
+		    if (visible.toLowerCase() === "true") {
+		      console.log("setting matrix visible to true");
+		      this.canvas.setAttribute('class', 'showThing');
+		      //this.canvas.className = '.showThing';
+		    } else if (visible.toLowerCase() === "false") {
+		      console.log("setting matrix visible to false");
+		      //this.canvas.className = '.hideThing';
+		      this.canvas.setAttribute('class', 'hideThing');
+		    }
 	       }
 
 	       updateDom(name, x, y, width, height) {

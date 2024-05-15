@@ -3,3 +3,15 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.hideThing {
+  opacity: 0;
+  transition: visibility 2s, opacity 2s;
+  visibility: hidden;
+}
+
+.showThing {
+  opacity: 1;
+  transition: visibility 2s, opacity 2s;
+  visibility: visible;
+}
