@@ -54,13 +54,13 @@ class WebSocketManager {
     this.riveInstances.forEach((value, key, map) => {
       console.log("Destroying rive instance:", key);
       value.destroy();
-      this.riveInstances.delete(value.name);
+      this.riveInstances.delete(value.uuid);
 			});
 
     this.matrixInstances.forEach((value, key, map) => {
       console.log("Destroying matrix instance:", key);
       value.destroy();
-      this.matrixInstances.delete(value.name);
+      this.matrixInstances.delete(value.uuid);
 			});
 	}
 
@@ -163,7 +163,7 @@ class WebSocketManager {
   }
 
   handleRiveStep(artBoard, stateMachine, inputName, inputValue, instanceID) {
-    if (artboard == "companion") {
+    if (artBoard == "companion") {
       return;
     }
     var instance = this.riveInstances.get(instanceID);
@@ -226,9 +226,13 @@ class WebSocketManager {
   }
 
   updateRiveInstance(existing, name, x, y, width, height, smname, autoplay) {
+		try {
     const instance = existing;
     instance.resetstatemachine(smname, autoplay);
     instance.updateDom(name, x, y, width, height);
+		} catch (e) {
+			console.log("Error updating Rive Instance: ", e);
+		}
   }
 
 handleAddMatrixInstance(words) {
