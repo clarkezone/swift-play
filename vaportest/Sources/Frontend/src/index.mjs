@@ -190,6 +190,12 @@ class WebSocketManager {
       console.log(`handleRiveStep called with P1:"${artBoard}":P2:"${stateMachine}"P3:"${inputName}"P4:"${inputValue}":`);
 
       instance.switchArtboardIfNeeded(artBoard, stateMachine, true);
+        if (inputName.includes('\/')) {
+          console.log("inputName contains a path hence using SetBooleanStateAtPath: ", inputName);
+          instance.setBooleanStateAtPath("ShowPhoneLaptopNas", true, "Tailnet");
+          return;
+          //instance.setBooleanStateAtPath(inputName, true);
+        }
       console.log(`Getting inputs for "${stateMachine}"`);
       const smInputs = instance.stateMachineInputs(stateMachine);
       if (smInputs != null) {
@@ -356,6 +362,10 @@ class RiveInstance {
 	console.log("Artboard is null.  Resetting regardless");
       this.resetartboard(artboard, statemachine, autoplay);
 		}
+  }
+
+  setBooleanStateAtPath(name, value, path) {
+    this.riveInstance.setBooleanStateAtPath(name, value, path);
   }
 
   resetstatemachine(artboard, autoplay) {
