@@ -1,5 +1,5 @@
 import "./styles.css";
-import {MatrixInstance} from "./matrix.mjs";
+import { MatrixInstance } from "./matrix.mjs";
 
 const rive = require("@rive-app/canvas");
 
@@ -55,14 +55,14 @@ class WebSocketManager {
       console.log("Destroying rive instance:", key);
       value.destroy();
       this.riveInstances.delete(value.uuid);
-			});
+    });
 
     this.matrixInstances.forEach((value, key, map) => {
       console.log("Destroying matrix instance:", key);
       value.destroy();
       this.matrixInstances.delete(value.uuid);
-			});
-	}
+    });
+  }
 
   handleAddRiveInstance(words) {
     const INSTANCE_ID = words[1];
@@ -127,7 +127,7 @@ class WebSocketManager {
     const PARAM_2 = words[3];
     const PARAM_3 = words[4];
     const PARAM_4 = words[5];
-//    const PARAM_5 = words[6];
+    //    const PARAM_5 = words[6];
     switch (MESSAGE_TYPE) {
       case "play":
         if (PARAM_1 && riveInstance) {
@@ -155,7 +155,7 @@ class WebSocketManager {
         }
         break;
       case "runStep":
-    this.handleRiveStep(PARAM_1, PARAM_2, PARAM_3, PARAM_4, INSTANCE_ID_COMMAND);
+        this.handleRiveStep(PARAM_1, PARAM_2, PARAM_3, PARAM_4, INSTANCE_ID_COMMAND);
         break;
       default:
         console.log("Unknown message type:", MESSAGE_TYPE);
@@ -170,32 +170,46 @@ class WebSocketManager {
     if (!instance) {
       console.log(`Instance instance "${instanceID}" not found in rive instances.`);
       instance = this.matrixInstances.get(instanceID);
-	    if (!instance) {
-	      console.log(`Instance instance "${instanceID}" not found in rive instances.`);
-	      return;
-			} else {
+      if (!instance) {
+        console.log(`Instance instance "${instanceID}" not found in rive instances.`);
+        return;
+      } else {
 
-			console.log(`Matrix instance found for "${instanceID}"`);
-			}
+        console.log(`Matrix instance found for "${instanceID}"`);
+      }
     } else {
-			console.log(`Rive Instance found for "${instanceID}"`);
+      console.log(`Rive Instance found for "${instanceID}"`);
     }
 
     if (artBoard == "matrix" && instance) {
-	instance.setVisible(stateMachine);
-			return;
+      instance.setVisible(stateMachine);
+      return;
     }
 
     if (artBoard && stateMachine) {
       console.log(`handleRiveStep called with P1:"${artBoard}":P2:"${stateMachine}"P3:"${inputName}"P4:"${inputValue}":`);
 
       instance.switchArtboardIfNeeded(artBoard, stateMachine, true);
-        if (inputName.includes('\/')) {
-          console.log("inputName contains a path hence using SetBooleanStateAtPath: ", inputName);
-          instance.setBooleanStateAtPath("ShowPhoneLaptopNas", true, "Tailnet");
+      if (inputName.includes('\/')) {
+        var lastIndexOfSlash = inputName.lastIndexOf('\/');
+        var components = inputName.split('\/');
+        if (components.length >= 1) { // we have a path
+          var path = inputName.substring(0, lastIndexOfSlash);
+          var name = components[components.length - 1];
+          console.log("inputName contains a path hence using SetBooleanStateAtPath :", inputName);
+          console.log("Last part of path (name) :", components[components.length - 1]);
+          console.log("Remainder :", inputName.substring(0, lastIndexOfSlash));
+          if (inputValue.toLowerCase() === "true") {
+            console.log("setting to true:", name, path);
+            instance.setBooleanStateAtPath(name, true, path);
+          } else if (inputValue.toLowerCase() === "false") {
+            console.log("setting to false:", name, path);
+            instance.setBooleanStateAtPath(name, false, path);
+          }
+          //instance.setBooleanStateAtPath("ShowPhoneLaptopNas", true, "Tailnet");
           return;
-          //instance.setBooleanStateAtPath(inputName, true);
         }
+      }
       console.log(`Getting inputs for "${stateMachine}"`);
       const smInputs = instance.stateMachineInputs(stateMachine);
       if (smInputs != null) {
@@ -232,16 +246,16 @@ class WebSocketManager {
   }
 
   updateRiveInstance(existing, name, x, y, width, height, smname, autoplay) {
-		try {
-    const instance = existing;
-    instance.resetstatemachine(smname, autoplay);
-    instance.updateDom(name, x, y, width, height);
-		} catch (e) {
-			console.log("Error updating Rive Instance: ", e);
-		}
+    try {
+      const instance = existing;
+      instance.resetstatemachine(smname, autoplay);
+      instance.updateDom(name, x, y, width, height);
+    } catch (e) {
+      console.log("Error updating Rive Instance: ", e);
+    }
   }
 
-handleAddMatrixInstance(words) {
+  handleAddMatrixInstance(words) {
     const INSTANCE_ID = words[1];
     const INSTANCE_NAME = words[2];
     const X_POSITION = parseFloat(words[3]);
@@ -350,18 +364,18 @@ class RiveInstance {
     // TODO: if artboard is the same but statemachine is different we don't work
     console.log("SwitchArtboardIfNeeded", artboard);
     if (this.riveInstance.artboard != null) {
-    let one = this.riveInstance.artboard.name;
-    console.log("currentArtboard", one);
-    if (one.localeCompare(artboard) != 0) {
-      console.log("Artboard is the different");
-      this.resetartboard(artboard, statemachine, autoplay);
+      let one = this.riveInstance.artboard.name;
+      console.log("currentArtboard", one);
+      if (one.localeCompare(artboard) != 0) {
+        console.log("Artboard is the different");
+        this.resetartboard(artboard, statemachine, autoplay);
+      } else {
+        console.log("Artboard is the same");
+      }
     } else {
-      console.log("Artboard is the same");
-    }
-		} else {
-	console.log("Artboard is null.  Resetting regardless");
+      console.log("Artboard is null.  Resetting regardless");
       this.resetartboard(artboard, statemachine, autoplay);
-		}
+    }
   }
 
   setBooleanStateAtPath(name, value, path) {
